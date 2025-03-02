@@ -2,6 +2,7 @@ package gameusecase
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 )
 
@@ -46,6 +47,8 @@ func (uc *GameUseCase) GetGame(id string) (Game, error) {
 	uc.mu.Lock()
 	defer uc.mu.Unlock()
 
+	fmt.Println("GetGame", id)
+
 	game, exists := uc.games[id]
 	if !exists {
 		return Game{}, errors.New(GAME_NOT_FOUND)
@@ -78,4 +81,17 @@ func (uc *GameUseCase) DeleteGame(id string) error {
 
 	delete(uc.games, id)
 	return nil
+}
+
+// ListGames lists all games
+func (uc *GameUseCase) ListGames() []Game {
+	uc.mu.Lock()
+	defer uc.mu.Unlock()
+
+	games := make([]Game, 0, len(uc.games))
+	for _, game := range uc.games {
+		games = append(games, game)
+	}
+
+	return games
 }
