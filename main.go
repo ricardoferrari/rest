@@ -4,10 +4,23 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ricardoferrari/ginrest/usecases/gameusecase"
 )
 
 func main() {
 	r := gin.Default()
+
+	gameUC := gameusecase.NewGameUseCase()
+
+	r.POST("/games", func(c *gin.Context) {
+		var game gameusecase.Game
+		if err := c.ShouldBindJSON(&game); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		gameUC.CreateGame(game)
+		c.JSON(http.StatusCreated, game)
+	})
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
